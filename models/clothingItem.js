@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const validatior = require("validator");
+const validator = require("validator");
 const clothingItem = mongoose.Schema({
   name: {
     type: String,
@@ -9,7 +9,7 @@ const clothingItem = mongoose.Schema({
     type: String,
     required: true,
   },
-  imageURL: {
+  imageUrl: {
     type: String,
     required: true,
     validate: {

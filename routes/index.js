@@ -4,7 +4,7 @@ const user = require("./users");
 const like = require("./likes");
 
 router.use("/items", clothingItem);
-router.use("/userrs", user);
+router.use("/users", user);
 router.use("/items", like);
 
 router.use((req, res) => {
