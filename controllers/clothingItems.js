@@ -56,7 +56,7 @@ const updateItems = (req, res) => {
         const notFoundError = new NotFoundError();
         return res
           .status(notFoundError.statusCode)
-          .send({ message: notFoundError.message });
+          .send({ message: notFoundErrormessage });
       }
     });
 };

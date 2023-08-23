@@ -20,17 +20,13 @@ module.exports.likeItem = (req, res) => {
       res.status(200).send({ data: item });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(NotFoundError).send({ message: "Invalid Id!" });
+      if (err.name === "NotFoundError") {
+        return res.status(NotFoundError).send({ message: NotFoundError });
       }
       if (err.statusCode === NotFoundError) {
-        return res
-          .status(NotFoundError)
-          .send({ message: "Id is not in database!" });
+        return res.status(NotFoundError).send({ message: NotFoundError });
       }
-      return res
-        .status(ServerError)
-        .send({ message: "An error occured on the server!" });
+      return res.status(ServerError).send({ message: ServerError });
     });
 };
 
@@ -41,7 +37,7 @@ module.exports.dislikeItem = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      const error = new Error("Item ID not found");
+      const error = new NotFoundError("Not Found");
       error.statusCode = NotFoundError;
       throw Error;
     })
@@ -49,16 +45,12 @@ module.exports.dislikeItem = (req, res) => {
       res.status(200).send({ data: item });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(ValidationError).send({ message: "Invalid Id!" });
+      if (err.name === "ValidationError") {
+        return res.status(ValidationError).send({ message: "Invalid Id" });
       }
       if (err.statusCode === NotFoundError) {
-        return res
-          .status(NotFoundError)
-          .send({ message: "Id is not in database!" });
+        return res.status(NotFoundError).send({ message: NotFoundError });
       }
-      return res
-        .status(ServerError)
-        .send({ message: "An error occured on the server!" });
+      return res.status(ServerError).send({ message: ServerError });
     });
 };
