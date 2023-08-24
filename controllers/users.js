@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const { ValidationError, NotFoundError } = require("../utils/errors");
+const { handleErrors } = require("../utils/errors");
 
 // Get users
 const getUsers = (req, res) => {
@@ -7,13 +7,8 @@ const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
     .catch((e) => {
-      console.log(e);
-      if (e.name && e.name === "ValidationError") {
-        const validationError = new ValidationError();
-        return res
-          .status(validationError.statusCode)
-          .send(validationError.message);
-      }
+      console.error(e);
+      handleErrors(req, res, e);
     });
 };
 const getUser = (req, res) => {
@@ -24,24 +19,8 @@ const getUser = (req, res) => {
     .orFail()
     .then((user) => res.status(200).send({ data: user }))
     .catch((e) => {
-      console.log(e.name);
-      if (
-        (e.name && e.name === "NotFoundError") ||
-        e.name === "DocumentNotFoundError"
-      ) {
-        console.log("throwing a NotFoundError");
-        const notFoundError = new NotFoundError();
-        return res
-          .status(notFoundError.statusCode)
-          .send({ message: notFoundError.message });
-      } else {
-        console.log("throwing a validationError", e);
-        const validationError = new ValidationError();
-        console.log(validationError.message);
-        return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
-      }
+      console.error(e);
+      handleErrors(req, res, e);
     });
 };
 const createUser = (req, res) => {
@@ -54,13 +33,8 @@ const createUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((e) => {
-      if (e.name && e.name === "ValidationError") {
-        console.log(ValidationError);
-        const validationError = new ValidationError();
-        return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
-      }
+      console.error(e);
+      handleErrors(req, res, e);
     });
 };
 module.exports = {

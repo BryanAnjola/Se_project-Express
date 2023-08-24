@@ -1,28 +1,19 @@
-class ValidationError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "ValidationError";
-    this.statusCode = 400;
-    this.message = "Invalid User";
+const ERROR_400 = 400;
+const ERROR_404 = 404;
+const ERROR_500 = 500;
+
+function handleErrors(req, res, err) {
+  console.log(err.name, "This is the console.log");
+  console.log(err.message, "This is the message");
+  if (err.name === "DocumentNotFoundError") {
+    return res.status(ERROR_404).send({ message: "No document found" });
   }
+  if (err.name === "ValidationError" || err.name === "CastError") {
+    return res.status(ERROR_400).send({ message: "Invalid data" });
+  }
+  return res.status(ERROR_500).send({
+    message: "An error has occurred on the server",
+  });
 }
 
-class NotFoundError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "NotFoundError";
-    this.statusCode = 404;
-    this.message = "Not Found";
-  }
-}
-
-class ServerError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "ServerError";
-    this.statusCode = 500;
-    this.message = "Server Error";
-  }
-}
-
-module.exports = { ValidationError, NotFoundError, ServerError };
+module.exports = { ERROR_400, ERROR_404, ERROR_500, handleErrors };

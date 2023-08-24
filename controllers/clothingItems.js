@@ -1,6 +1,6 @@
 const clothingItem = require("../models/clothingItem");
 const ClothingItem = require("../models/clothingItem");
-const { ValidationError, NotFoundError } = require("../utils/errors");
+const { handleErrors } = require("../utils/errors");
 
 const createItem = (req, res) => {
   console.log(req);
@@ -17,31 +17,18 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((e) => {
-      console.log(e);
-      if (e.name && e.name === "NotFoundError") {
-        console.log("NotFoundError");
-        const notFoundError = new NotFoundError();
-        return res
-          .status(notFoundError.statusCode)
-          .send({ message: notFoundError.message });
-      } else if (e.name === "ValidationError") {
-        const validationError = new ValidationError();
-        return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
-      }
+      console.error(e);
+      handleErrors(req, res, e);
     });
 };
 const getItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => {
+      res.send({ data: items });
+    })
     .catch((e) => {
-      if (e.name && e.name === "ValidationError") {
-        const validationError = new ValidationError();
-        return res
-          .status(validationError.statusCode)
-          .send({ message: validationError.message });
-      }
+      console.error(e);
+      handleErrors(req, res, e);
     });
 };
 
@@ -52,12 +39,8 @@ const updateItems = (req, res) => {
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
-      if (e.name && e.name === "NotFoundError") {
-        const notFoundError = new NotFoundError();
-        return res
-          .status(notFoundError.statusCode)
-          .send({ message: notFoundErrormessage });
-      }
+      console.error(e);
+      handleErrors(req, res, e);
     });
 };
 
@@ -66,19 +49,11 @@ const deleteItem = (req, res) => {
   console.log(itemId);
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) =>
-      res
-        .status(204)
-        .send({})
-        .catch((e) => {
-          if (e.name && e.name === "NotFoundError") {
-            const notFoundError = new NotFoundError();
-            return res
-              .status(notFoundError.statusCode)
-              .send({ message: notFoundError.message });
-          }
-        }),
-    );
+    .then((item) => res.send({ data: item }))
+    .catch((e) => {
+      console.error(e);
+      handleErrors(req, res, e);
+    });
 };
 module.exports = { createItem, getItems, updateItems, deleteItem };
 module.exports.createClothingItem = (req, res) => {
