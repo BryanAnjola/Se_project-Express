@@ -11,9 +11,6 @@ module.exports.likeItem = (req, res) => {
     .then((item) => {
       res.send({ data: item });
     })
-    .then((item) => {
-      res.status(200).send({ data: item });
-    })
     .catch((e) => {
       console.error(e);
       handleErrors(req, res, e);

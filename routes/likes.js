@@ -1,5 +1,3 @@
-const { request } = require("express");
-
 const router = require("express").Router();
 
 const { likeItem, dislikeItem } = require("../controllers/likes");

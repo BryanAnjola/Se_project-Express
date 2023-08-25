@@ -13,7 +13,6 @@ const getUsers = (req, res) => {
 };
 const getUser = (req, res) => {
   const { userId } = req.params;
-  const { avatar } = req.body;
 
   User.findById(userId)
     .orFail()
