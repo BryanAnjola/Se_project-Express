@@ -11,6 +11,9 @@ function handleErrors(req, res, err) {
   if (err.name === "ValidationError" || err.name === "CastError") {
     return res.status(ERROR_400).send({ message: "Invalid data" });
   }
+  if (err.name === "DuplicateError") {
+    return res.status(ERROR_11000).send({ message: "Duplicate data" });
+  }
   return res.status(ERROR_500).send({
     message: "An error has occurred on the server",
   });
