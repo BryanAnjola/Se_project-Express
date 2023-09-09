@@ -16,10 +16,9 @@ const getUsers = (req, res) => {
     });
 };
 const getUser = (req, res) => {
-  User.find({})
-    .then((users) => {
-      res.send({ data: users });
-    })
+  User.findById(req.params.userId)
+    .orFail()
+    .then((user) => res.status(200).send({ data: user }))
     .catch((e) => {
       console.error(e);
       handleErrors(req, res, e);
@@ -80,13 +79,13 @@ const updateUser = (req, res) => {
       handleErrors(req, res, err);
     });
 };
-const getCurrentUser = (req, res, next) => {
+const getCurrentUser = (req, res) => {
   const { _id: userId } = req.user;
 
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        next(res.status(404).send({ message: "User not found" }));
+        res.status(404).send({ message: "User not found" });
       }
       return next(res.send(user));
     })
