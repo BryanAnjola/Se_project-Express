@@ -3,7 +3,7 @@ const validator = require("validator");
 
 const bcrypt = require("bcrypt");
 
-const user = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -55,4 +55,4 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(
     });
 };
 
-module.exports = mongoose.model("users", user);
+module.exports = mongoose.model("user", userSchema);
