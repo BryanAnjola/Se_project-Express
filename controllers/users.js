@@ -39,7 +39,7 @@ const createUser = (req, res) => {
           res.send({ name, avatar, email, _id: user._id });
         })
         .catch((err) => {
-          console.error(err, "console error for createUser");
+          console.error(err, "error for createUser");
           handleErrors(req, res, err);
         });
     }
@@ -61,7 +61,20 @@ const login = (req, res) => {
       handleErrors(req, res, e);
     });
 };
+const getCurrentUser = (req, res) => {
+  const { _id: userId } = req.user;
 
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: "User not found" });
+      }
+      return res.send(user);
+    })
+    .catch((err) => {
+      handleErrors(req, res, err);
+    });
+};
 const updateUser = (req, res) => {
   const { name, avatar } = req.body;
   const userId = req.user._id;
@@ -79,21 +92,6 @@ const updateUser = (req, res) => {
       handleErrors(req, res, err);
     });
 };
-const getCurrentUser = (req, res) => {
-  const { _id: userId } = req.user;
-
-  User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: "User not found" });
-      }
-      return next(res.send(user));
-    })
-    .catch((err) => {
-      handleErrors(req, res, err);
-    });
-};
-
 module.exports = {
   getUser,
   createUser,

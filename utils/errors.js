@@ -30,4 +30,4 @@ function handleErrors(req, res, err) {
   });
 }
 
-module.exports = { ERROR_400, ERROR_404, ERROR_500, handleErrors };
+module.exports = { ERROR_400, ERROR_404, ERROR_409, ERROR_500, handleErrors };

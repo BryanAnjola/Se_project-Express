@@ -32,17 +32,30 @@ const getItems = (req, res) => {
 };
 
 const deleteItem = (req, res) => {
-  console.log(req.params.itemId);
-  if (req.params.itemId !== req.user._id) {
-    res.status(403).send({ message: "Forbidden" });
-  } else {
-    ClothingItem.findByIdAndDelete(req.params.itemId)
-      .orFail()
-      .then((item) => res.send({ data: item }))
-      .catch((e) => {
-        console.error(e);
-        handleErrors(req, res, e);
-      });
-  }
+  const { itemId } = req.params;
+
+  ClothingItem.findById(itemId)
+    .orFail()
+    .then((item) => {
+      const itemOwner = item.owner.toString();
+
+      if (req.user._id !== itemOwner) {
+        res.status(403).send({ message: "Forbidden" });
+      } else {
+        ClothingItem.findByIdAndDelete(itemId)
+          .orFail()
+          .then((itemRes) => {
+            res.send({ data: itemRes });
+          })
+          .catch((e) => {
+            console.error(e);
+            handleErrors(req, res, e);
+          });
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      handleErrors(req, res, e);
+    });
 };
 module.exports = { createItem, getItems, deleteItem };

@@ -4,6 +4,14 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    validate: {
+      validator: (v) => validator.isEmail(v),
+    },
+    message: "This is not a email",
+  },
   name: {
     type: String,
     required: true,
@@ -15,18 +23,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => validator.isURL(v),
-      message: "This is not a Link",
     },
+    message: "This is not a Link",
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: {
-      validator: (v) => validator.isEmail(v),
-      message: "This is not a email",
-    },
-  },
+
   password: {
     type: String,
     required: true,
