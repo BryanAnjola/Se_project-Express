@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const { handleErrors } = require("../utils/errors");
+const { handleErrors, ERROR_404, ERROR_409 } = require("../utils/errors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
@@ -18,7 +18,7 @@ const getUsers = (req, res) => {
 const getUser = (req, res) => {
   User.findById(req.params.userId)
     .orFail()
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.send({ data: user }))
     .catch((e) => {
       console.error(e);
       handleErrors(req, res, e);
@@ -30,7 +30,7 @@ const createUser = (req, res) => {
 
   User.findOne({ email }).then((emailFound) => {
     if (emailFound) {
-      res.status(409).send({ message: "User already exists" });
+      res.status(ERROR_409).send({ message: "User already exists" });
     } else {
       bcrypt
         .hash(password, 10)
@@ -67,7 +67,7 @@ const getCurrentUser = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: "User not found" });
+        res.status(ERROR_404).send({ message: "User not found" });
       }
       return res.send(user);
     })

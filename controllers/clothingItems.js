@@ -1,5 +1,6 @@
 const ClothingItem = require("../models/clothingItem");
 const { handleErrors } = require("../utils/errors");
+const { ERROR_403 } = require("../utils/errors");
 
 const createItem = (req, res) => {
   console.log(req);
@@ -40,7 +41,7 @@ const deleteItem = (req, res) => {
       const itemOwner = item.owner.toString();
 
       if (req.user._id !== itemOwner) {
-        res.status(403).send({ message: "Forbidden" });
+        res.status(ERROR_403).send({ message: "Forbidden" });
       } else {
         ClothingItem.findByIdAndDelete(itemId)
           .orFail()
