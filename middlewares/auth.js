@@ -18,6 +18,14 @@ module.exports.handleAuthError = (req, res, next) => {
     return res.status(ERROR_401).send({ message: "Invalid Token" });
   }
 
+  // try {
+  //   payload = jwt.verify(token, 'some-secret-key');
+  // } catch (e) {
+  //   const err = new Error('Authorization required');
+  //   err.statusCode = 401;
+
+  //   next(err);
+  // }
   req.user = payload;
   return next();
 };

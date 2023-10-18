@@ -1,31 +1,42 @@
 const ClothingItem = require("../models/clothingItem");
-const { handleErrors } = require("../utils/errors");
+const { BadRequestError } = require("../Errors/BadRequestError");
+const { NotFoundError } = require("../Errors/NotFoundError");
 
-module.exports.likeItem = (req, res) => {
+module.exports.likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail()
+    .orFail(() => {
+      throw new NotFoundError("an item with the specified id not found");
+    })
     .then((item) => {
       res.send({ data: item });
     })
     .catch((e) => {
-      console.error(e);
-      handleErrors(req, res, e);
+      if (e.name === "CastError") {
+        next(new BadRequestError("invalid data"));
+      } else {
+        next(e);
+      }
     });
 };
-module.exports.dislikeItem = (req, res) => {
+module.exports.dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail()
+    .orFail(() => {
+      throw new NotFoundError("an item with the specified id not found");
+    })
     .then((item) => res.send({ data: item }))
     .catch((e) => {
-      console.error(e);
-      handleErrors(req, res, e);
+      if (e.name === "CastError") {
+        next(new BadRequestError("invalid data"));
+      } else {
+        next(e);
+      }
     });
 };

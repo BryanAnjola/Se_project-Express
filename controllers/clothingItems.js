@@ -1,8 +1,9 @@
 const ClothingItem = require("../models/clothingItem");
-const { handleErrors } = require("../utils/errors");
-const { ERROR_403 } = require("../utils/errors");
+const { ForbiddenError } = require("../Errors/ForbiddenError");
+const { BadRequestError } = require("../Errors/BadRequestError");
+const { NotFoundError } = require("../Errors/NotFoundError");
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   console.log(req);
   console.log(req.body);
   const { name, weather, imageUrl } = req.body;
@@ -17,22 +18,22 @@ const createItem = (req, res) => {
       res.send({ data: item });
     })
     .catch((e) => {
-      console.error(e);
-      handleErrors(req, res, e);
+      if (e.name === "ValidationError") {
+        next(new BadRequestError("invalid data"));
+      } else {
+        next(e);
+      }
     });
 };
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => {
       res.send({ data: items });
     })
-    .catch((e) => {
-      console.error(e);
-      handleErrors(req, res, e);
-    });
+    .catch((e) => next(e));
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
 
   ClothingItem.findById(itemId)
@@ -41,22 +42,22 @@ const deleteItem = (req, res) => {
       const itemOwner = item.owner.toString();
 
       if (req.user._id !== itemOwner) {
-        res.status(ERROR_403).send({ message: "Forbidden" });
+        throw new NotFoundError("an item with specified id not found");
       } else {
         ClothingItem.findByIdAndDelete(itemId)
           .orFail()
           .then((itemRes) => {
             res.send({ data: itemRes });
-          })
-          .catch((e) => {
-            console.error(e);
-            handleErrors(req, res, e);
           });
+        throw new ForbiddenError("cannot delete another user's post");
       }
     })
-    .catch((e) => {
-      console.error(e);
-      handleErrors(req, res, e);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        next(new BadRequestError("invalid data"));
+      } else {
+        next(err);
+      }
     });
 };
 module.exports = { createItem, getItems, deleteItem };
