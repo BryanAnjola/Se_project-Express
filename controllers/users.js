@@ -19,7 +19,7 @@ const getUsers = (req, res, next) => {
 };
 const getUser = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail()
+    .orFail(() => new NotFoundError("A user with specified id not found"))
     .then((user) => res.send({ data: user }))
     .catch((e) => {
       next(e);
@@ -29,26 +29,33 @@ const getUser = (req, res, next) => {
 const createUser = (req, res, next) => {
   const { email, password, name, avatar } = req.body;
 
-  User.findOne({ email }).then((emailFound) => {
-    if (emailFound) {
-      throw new ConflictError("a user with this email already exists");
-      return bcrypt.hash(password, 10);
-    } else {
-      bcrypt
-        .hash(password, 10)
-        .then((hash) => User.create({ name, avatar, email, password: hash }))
-        .then((user) => {
-          res.send({ name, avatar, email, _id: user._id });
-        })
-        .catch((err) => {
-          if (err.name === "ValidationError") {
-            next(new BadRequestError("invalid data"));
-          } else {
-            next(err);
-          }
-        });
-    }
-  });
+  User.findOne({ email })
+    .then((emailFound) => {
+      if (emailFound) {
+        next(new ConflictError("User already exists"));
+      } else {
+        bcrypt
+          .hash(password, 10)
+          .then((hash) => User.create({ name, avatar, email, password: hash }))
+          .then((user) => {
+            res.send({ name, avatar, email, _id: user._id });
+          })
+          .catch((e) => {
+            if (e.name === "ValidationError") {
+              next(new BadRequestError("Invalid data"));
+            } else {
+              next(e);
+            }
+          });
+      }
+    })
+    .catch((e) => {
+      if (e.name === "ValidationError") {
+        next(new BadRequestError("Invalid data"));
+      } else {
+        next(e);
+      }
+    });
 };
 
 const login = (req, res, next) => {
@@ -69,7 +76,7 @@ const getCurrentUser = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(ERROR_404).send({ message: "User not found" });
+        next(new NotFoundError("User not found"));
       }
       return res.send(user);
     })

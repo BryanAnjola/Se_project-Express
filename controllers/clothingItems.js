@@ -37,19 +37,18 @@ const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
 
   ClothingItem.findById(itemId)
-    .orFail()
+    .orFail(() => new NotFoundError("an item with specified id not found"))
     .then((item) => {
       const itemOwner = item.owner.toString();
 
       if (req.user._id !== itemOwner) {
-        throw new NotFoundError("an item with specified id not found");
+        throw new ForbiddenError("cannot delete another user's post");
       } else {
         ClothingItem.findByIdAndDelete(itemId)
           .orFail()
           .then((itemRes) => {
             res.send({ data: itemRes });
           });
-        throw new ForbiddenError("cannot delete another user's post");
       }
     })
     .catch((err) => {
