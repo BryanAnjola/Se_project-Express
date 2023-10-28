@@ -39,8 +39,9 @@ module.exports.validateUserInfoBody = celebrate({
       "string.empty": 'The "email" field must be filled in',
       "string.email": 'The "email" field must be a valid email',
     }),
-    password: Joi.string().required().message({
-      "password.empty": 'The "password" field must be filled in',
+    password: Joi.string().required().min(8).message({
+      "string.min": 'The minimum length of the "password" field is 8',
+      "string.empty": 'The "password" field must be filled in',
     }),
   }),
 });
@@ -50,8 +51,9 @@ module.exports.validateLogin = celebrate({
       "string.empty": 'The "email" field must be filled in',
       "string.email": 'The "email" field must be a valid email',
     }),
-    password: Joi.string().required().messages({
-      "password.empty": 'The "password" field must be filled in',
+    password: Joi.string().required().min(8).messages({
+      "string.min": 'The minimum length of the "password" field is 8',
+      "string.empty": 'The "password" field must be filled in',
     }),
   }),
 });

@@ -48,14 +48,21 @@ const deleteItem = (req, res, next) => {
           .orFail()
           .then((itemRes) => {
             res.send({ data: itemRes });
+          })
+          .catch((e) => {
+            if (e.name === "CastError") {
+              next(new BadRequestError("Invalid data"));
+            } else {
+              next(e);
+            }
           });
       }
     })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BadRequestError("invalid data"));
+    .catch((e) => {
+      if (e.name === "CastError") {
+        next(new BadRequestError("Invalid data"));
       } else {
-        next(err);
+        next(e);
       }
     });
 };
