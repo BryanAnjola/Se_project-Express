@@ -27,4 +27,7 @@ app.use(limiter);
 // //app.use((err, req, res, next) => {
 //   res.status(500).send({ message: 'An error occurred on the server' });
 // });
-app.listen(PORT, () => {});
+app.listen(PORT, () => {
+  console.log(`App listening at ${PORT}`);
+  console.log("this is working");
+});
