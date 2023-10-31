@@ -5,16 +5,12 @@ const cors = require("cors");
 const { errors } = require("celebrate");
 const { errorHandler } = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
-
-//app.js
-
 const { PORT = 3001 } = process.env;
 const app = express();
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
 const routes = require("./routes");
-
 
 app.use(express.json());
 app.use(cors());
